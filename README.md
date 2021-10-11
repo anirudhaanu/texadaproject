@@ -50,7 +50,11 @@ When returning, things can be a bit tricky for the Json data provided. This dumm
 But things are straightforward for the product whose avialabity is made false by the user in the app. For this kind of scenario a date range is already saved. So Price calculation can be made
 
 #### Durability
-Durabity is calculated at two different times. Firstly, at the time of booking using daterange and product type and secondly, at the time of returning if the product type is meter. All these changes are mirrored in the data tables
+Durabity is calculated at two different times. 
+ * Firstly, at the time of booking using daterange and product type and 
+ * Secondly, at the time of returning if the product type is meter. All these changes are mirrored in the data tables.
+
+If the durability is 0 at the time of booking, the operation is not forwarded
 
 ## Additional Features
 * Sorting columns 
@@ -59,6 +63,7 @@ Durabity is calculated at two different times. Firstly, at the time of booking u
 * Notification for data changing event in localstorage
 * In Checkout dialog - only available or unavilable products can be selected depending on the Button pressed e.g. Book, Return
 * Live cost calculation and date warning when booking products
+* 
 
 ## Things I wish could be better
 * naming convention
@@ -66,6 +71,7 @@ Durabity is calculated at two different times. Firstly, at the time of booking u
 * cleaner code
 * documentation
 * Greater isolation of business logic and UI
+* Durability check
 
 
 ## Thank You !
