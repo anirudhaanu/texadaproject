@@ -68,6 +68,5 @@ Durabity is calculated at two different times. Firstly, at the time of booking u
 * Greater isolation of business logic and UI
 
 
-
 ## Thank You !
 
