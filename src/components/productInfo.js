@@ -24,7 +24,10 @@ export default function ProductInfo({ product }) {
         {Object.keys(product)
           .filter(
             (item) =>
-              item === "needing_repair" || item === "type" || item === "price"
+              item === "needing_repair" ||
+              item === "type" ||
+              item === "price" ||
+              item === "minimum_rent_period"
           )
           .map((item) => {
             return (

@@ -1,11 +1,10 @@
-import logo from "./logo.svg";
 import "./App.css";
-import EnhancedTable from "./modules/table";
+import HomePage from "./pages/Home";
 
 function App() {
   return (
     <div className="App">
-      <EnhancedTable />
+      <HomePage />
     </div>
   );
 }

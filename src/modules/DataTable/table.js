@@ -27,8 +27,8 @@ import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 
 import SearchBar from "material-ui-search-bar";
 
-import Data from "../data/dummyData.json";
-import ButtonsSection from "./bookProduct/bookButton";
+import Data from "../../data/dummyData.json";
+import ButtonsSection from "../ProductCheckout/bookButton";
 import { withStyles } from "@material-ui/styles";
 
 function insertIDs(data) {
@@ -98,7 +98,12 @@ const headCells = [
     disablePadding: false,
     label: "Availability",
   },
-  { id: "repair", numeric: true, disablePadding: false, label: "Needs Repair" },
+  {
+    id: "needing_repair",
+    numeric: true,
+    disablePadding: false,
+    label: "Needs Repair",
+  },
   {
     id: "durability",
     numeric: true,
@@ -110,26 +115,37 @@ const headCells = [
 
 const useTableHeadStyle = makeStyles((theme) => ({
   tableCell: {
-    background: theme.palette.grey["700"],
-    color: "white",
+    background: theme.palette.grey["100"],
+
     fontSize: 20,
     fontWeight: 300,
   },
 }));
 
-function EnhancedTableHead() {
+function EnhancedTableHead(props) {
   const classes = useTableHeadStyle();
+  const { onSelectAllClick, order, orderBy, rowCount, onRequestSort } = props;
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
   return (
     <TableHead>
       <TableRow>
         {headCells.map((headCell) => (
           <CustomTableCell
             key={headCell.id}
-            align="center"
+            align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
+            sortDirection={orderBy === headCell.id ? order : false}
             className={classes.tableCell}
           >
-            {headCell.label}
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : "asc"}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+            </TableSortLabel>
           </CustomTableCell>
         ))}
       </TableRow>
@@ -167,60 +183,9 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }));
 
-const EnhancedTableToolbar = (props) => {
-  const classes = useToolbarStyles();
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          className={classes.title}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          className={classes.title}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Nutrition
-        </Typography>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton aria-label="delete">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
-};
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
-
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "80%",
+    width: "100%",
     marginTop: 40,
   },
   paper: {
@@ -272,30 +237,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable() {
+export default function EnhancedTable({
+  dataList,
+  selectedProduct,
+  callBackForTable,
+}) {
   const classes = useStyles();
-  const [rows, setRows] = React.useState(dummyRows);
+  const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("name+");
+  const [orderBy, setOrderBy] = React.useState("name");
   const [selected, setSelected] = React.useState(null);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [selectedRow, setSelectedRow] = React.useState(null);
+  const [selectedRow, setSelectedRow] = React.useState(selectedProduct);
   const [searched, setSearched] = React.useState("");
 
+  React.useEffect(() => {
+    setRows(dataList);
+  }, [dataList]);
+
   const requestSearch = (searchedVal) => {
-    const filteredRows = dummyRows.filter((row) => {
+    const filteredRows = dataList.filter((row) => {
       return row.name.toLowerCase().includes(searchedVal.toLowerCase());
     });
     setRows(filteredRows);
-  };
-
-  const updateTable = () => {
-    const fetchedFromLocalStorage = JSON.parse(
-      localStorage.getItem("dataList")
-    );
-    setRows(fetchedFromLocalStorage);
   };
 
   const cancelSearch = () => {
@@ -304,17 +270,32 @@ export default function EnhancedTable() {
   };
 
   const handleClick = (event, name) => {
-    console.log(name);
-    if (selectedRow && selectedRow.id === name.id) setSelectedRow(null);
-    else setSelectedRow(name);
-    //const selectedIndex = rows.indexOf(name);
-    //console.log(selectedIndex);
-
-    //setSelected(newSelected);
+    // console.log(name);
+    if (selectedRow && selectedRow.id === name.id) {
+      callBackForTable(null);
+      setSelectedRow(null);
+    } else {
+      callBackForTable(name);
+      setSelectedRow(name);
+    }
+  };
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelecteds = rows.map((n) => n.name);
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -352,7 +333,13 @@ export default function EnhancedTable() {
             size={dense ? "small" : "medium"}
             aria-label="sticky table"
           >
-            <EnhancedTableHead />
+            <EnhancedTableHead
+              order={order}
+              orderBy={orderBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={rows.length}
+            />
             <TableBody className={classes.tableBody}>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -425,11 +412,6 @@ export default function EnhancedTable() {
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
-      />
-      <ButtonsSection
-        dataList={rows}
-        selectedRow={selectedRow}
-        updateTable={updateTable}
       />
     </div>
   );

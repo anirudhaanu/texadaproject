@@ -26,6 +26,7 @@ export default function BookConfirmationDialog({
           ? "Do you want to book ?"
           : "Do you want to return ?"}
       </DialogTitle>
+
       {product && (
         <DialogContent>
           {!product.startDate && (
