@@ -1,6 +1,7 @@
 # Getting Started with texadaproject
 Assignment Project for the role Frontend Enginner
 This project is live here https://texadaproject.web.app/
+
 In the project directory, you can run:
 ### `npm start`
 Runs the app in the development mode.\
