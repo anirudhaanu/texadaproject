@@ -1,247 +1,27 @@
 import React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { lighten, makeStyles, alpha } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-
 import Paper from "@material-ui/core/Paper";
-
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Chip from "@material-ui/core/Chip";
-
+import Button from "@material-ui/core/Button";
 import SearchBar from "material-ui-search-bar";
-
-import Data from "../../data/dummyData.json";
-
+import EnhancedTableHead from "./components/enhancedTableHeads";
+import useStyles from "./styles/tableStyle";
+import { getComparator, stableSort } from "./utils/tableUtils";
 import { withStyles } from "@material-ui/styles";
-
-function insertIDs(data) {
-  let temp = [];
-  data.map((item, index) => {
-    temp = [...temp, { ...item, id: index }];
-  });
-  //console.log(data);
-  return temp;
-}
-
-function initDataFromLocalStorage(data) {
-  if (!localStorage.getItem("dataList")) {
-    localStorage.setItem("dataList", JSON.stringify(insertIDs(data)));
-  }
-
-  const fetchedData = JSON.parse(localStorage.getItem("dataList"));
-  return fetchedData;
-}
-
-const dummyRows = initDataFromLocalStorage(Data);
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 
 const CustomTableCell = withStyles((theme) => ({
   root: {
     textAlign: "center",
   },
 }))(TableCell);
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-const headCells = [
-  { id: "id", numeric: true, disablePadding: false, label: "id" },
-  {
-    id: "name",
-    numeric: false,
-    disablePadding: true,
-    label: "Product",
-  },
-  { id: "code", numeric: true, disablePadding: false, label: "Code" },
-  {
-    id: "availability",
-    numeric: true,
-    disablePadding: false,
-    label: "Availability",
-  },
-  {
-    id: "needing_repair",
-    numeric: true,
-    disablePadding: false,
-    label: "Needs Repair",
-  },
-  {
-    id: "durability",
-    numeric: true,
-    disablePadding: false,
-    label: "Durability",
-  },
-  { id: "mileage", numeric: true, disablePadding: false, label: "Mileage" },
-];
-
-const useTableHeadStyle = makeStyles((theme) => ({
-  tableCell: {
-    background: theme.palette.grey["100"],
-
-    fontSize: 20,
-    fontWeight: 300,
-  },
-}));
-
-function EnhancedTableHead(props) {
-  const classes = useTableHeadStyle();
-  const { onSelectAllClick, order, orderBy, rowCount, onRequestSort } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-  return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell) => (
-          <CustomTableCell
-            key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
-            padding={headCell.disablePadding ? "none" : "normal"}
-            sortDirection={orderBy === headCell.id ? order : false}
-            className={classes.tableCell}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-            </TableSortLabel>
-          </CustomTableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-EnhancedTableHead.propTypes = {
-  classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
-const useToolbarStyles = makeStyles((theme) => ({
-  root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-  },
-  highlight:
-    theme.palette.type === "light"
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  title: {
-    flex: "1 1 100%",
-  },
-}));
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    marginTop: 40,
-  },
-  paper: {
-    width: "100%",
-    marginBottom: theme.spacing(2),
-    paddingTop: 20,
-  },
-  table: {
-    minWidth: 750,
-  },
-  container: {
-    height: window.innerHeight * 0.5,
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: "rect(0 0 0 0)",
-    height: 1,
-    margin: -1,
-    overflow: "hidden",
-    padding: 0,
-    position: "absolute",
-    top: 20,
-    width: 1,
-  },
-
-  tableCell: {
-    background: "yellow",
-  },
-  tableRowTrue: {
-    cursor: "pointer",
-    "&.Mui-selected, &.Mui-selected:hover": {
-      backgroundColor: alpha(theme.palette.primary.main, 0.2),
-    },
-  },
-  tableRowFalse: {
-    cursor: "pointer",
-    "&.Mui-selected, &.Mui-selected:hover": {
-      backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-    },
-  },
-  avialabiltyCell: {},
-  searchContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    background: theme.palette.grey["300"],
-    "& h2": {
-      display: "flex",
-      margin: 0,
-      marginLeft: 20,
-      fontWeight: 300,
-      alignItems: "center",
-    },
-  },
-
-  searchBar: {
-    margin: 20,
-    width: 300,
-  },
-  avialabiltyChip: {
-    height: 25,
-    width: 60,
-    fontWeight: "bold",
-  },
-}));
 
 const PurpleSwitch = withStyles({
   switchBase: {
@@ -269,7 +49,7 @@ export default function EnhancedTable({
   const [selected, setSelected] = React.useState(null);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(20);
   const [selectedRow, setSelectedRow] = React.useState(null);
   const [searched, setSearched] = React.useState("");
 
@@ -328,8 +108,6 @@ export default function EnhancedTable({
     setDense(event.target.checked);
   };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
-
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -365,7 +143,6 @@ export default function EnhancedTable({
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  //const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -439,10 +216,22 @@ export default function EnhancedTable({
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<PurpleSwitch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
+      <div className={classes.tableFooterContainer}>
+        <FormControlLabel
+          control={
+            <PurpleSwitch checked={dense} onChange={handleChangeDense} />
+          }
+          label="Dense padding"
+        />
+        <Button
+          variant="outlined"
+          className={classes.resetButton}
+          onClick={(e) => handleRequestSort(e, "id")}
+        >
+          Reset
+          <RotateLeftIcon />
+        </Button>
+      </div>
     </div>
   );
 }

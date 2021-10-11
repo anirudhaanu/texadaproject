@@ -13,13 +13,13 @@ import { makeStyles } from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 
-import DateRangePicker from "../../components/dateRangePicker";
-import DisabledDateRangePicker from "../../components/disabledDateRangePicker";
-import ProductInfo from "../../components/productInfo";
-import DialogFooterSection from "../../components/dialogFooterSection";
-import MileageInputForReturn from "../../components/mileageInputForReturn";
-import DifferenceInDay from "../../utils/differenceInDays";
-import IntegerValidation from "../../utils/integerValidation";
+import DateRangePicker from "../../../components/dateRangePicker";
+import DisabledDateRangePicker from "../../../components/disabledDateRangePicker";
+import ProductInfo from "../../../components/productInfo";
+import DialogFooterSection from "../../../components/dialogFooterSection";
+import MileageInputForReturn from "../../../components/mileageInputForReturn";
+import DifferenceInDay from "../../../utils/differenceInDays";
+import IntegerValidation from "../../../utils/integerValidation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BookCheckoutDialog({
+export default function CheckoutDialog({
   open,
   handleCloseBook,
   dataList,
@@ -60,6 +60,8 @@ export default function BookCheckoutDialog({
   setMileAgeAdded,
 }) {
   const classes = useStyles();
+
+  //boolean result whether book/return button is disabledd or not
   const checkButtonDisability = () => {
     if (buttonType === "book")
       return (
@@ -116,6 +118,7 @@ export default function BookCheckoutDialog({
 
         <ProductInfo product={product} />
 
+        {/*only visible for returning product with type "meter" */}
         {buttonType === "return" && product.type === "meter" && (
           <MileageInputForReturn
             mileAgeAdded={mileAgeAdded}
@@ -127,6 +130,7 @@ export default function BookCheckoutDialog({
           <DateRangePicker callBack={(e) => setTimeRange(e)} />
         )}
 
+        {/*only visible if returning item has an timerange */}
         {buttonType === "return" && product.startDate && product.endDate && (
           <DisabledDateRangePicker
             startDate={product.startDate}
@@ -153,7 +157,7 @@ export default function BookCheckoutDialog({
         <Button
           color="primary"
           autoFocus
-          onClick={() => setConfirmationOpen(true)}
+          onClick={() => setConfirmationOpen(true)} //callBack to index.js to open confirmation dialog
           disabled={checkButtonDisability()}
         >
           {buttonType === "return" ? "Return" : "Book"}
