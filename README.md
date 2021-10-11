@@ -67,8 +67,7 @@ Durabity is calculated at two different times. Firstly, at the time of booking u
 * documentation
 * Greater isolation of business logic and UI
 
-# Things I wish could achieve
-* Testing. It is not my strong zone
+
 
 ## Thank You !
 
