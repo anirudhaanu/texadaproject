@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { lighten, makeStyles } from "@material-ui/core/styles";
+import { lighten, makeStyles, alpha } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -10,25 +10,17 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
+
 import Paper from "@material-ui/core/Paper";
-import Checkbox from "@material-ui/core/Checkbox";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
+
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
-import DeleteIcon from "@material-ui/icons/Delete";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import Button from "@material-ui/core/Button";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import Chip from "@material-ui/core/Chip";
 
 import SearchBar from "material-ui-search-bar";
 
 import Data from "../../data/dummyData.json";
-import ButtonsSection from "../ProductCheckout/bookButton";
+
 import { withStyles } from "@material-ui/styles";
 
 function insertIDs(data) {
@@ -214,8 +206,17 @@ const useStyles = makeStyles((theme) => ({
   tableCell: {
     background: "yellow",
   },
-  tableRow: {
+  tableRowTrue: {
     cursor: "pointer",
+    "&.Mui-selected, &.Mui-selected:hover": {
+      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+    },
+  },
+  tableRowFalse: {
+    cursor: "pointer",
+    "&.Mui-selected, &.Mui-selected:hover": {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+    },
   },
   avialabiltyCell: {},
   searchContainer: {
@@ -235,7 +236,26 @@ const useStyles = makeStyles((theme) => ({
     margin: 20,
     width: 300,
   },
+  avialabiltyChip: {
+    height: 25,
+    width: 60,
+    fontWeight: "bold",
+  },
 }));
+
+const PurpleSwitch = withStyles({
+  switchBase: {
+    color: "grey",
+    "&$checked": {
+      color: "grey",
+    },
+    "&$checked + $track": {
+      backgroundColor: "yellow",
+    },
+  },
+  checked: {},
+  track: {},
+})(Switch);
 
 export default function EnhancedTable({
   dataList,
@@ -250,12 +270,13 @@ export default function EnhancedTable({
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [selectedRow, setSelectedRow] = React.useState(selectedProduct);
+  const [selectedRow, setSelectedRow] = React.useState(null);
   const [searched, setSearched] = React.useState("");
 
   React.useEffect(() => {
     setRows(dataList);
-  }, [dataList]);
+    setSelectedRow(selectedProduct);
+  }, [dataList, selectedProduct]);
 
   const requestSearch = (searchedVal) => {
     const filteredRows = dataList.filter((row) => {
@@ -355,7 +376,11 @@ export default function EnhancedTable({
                       tabIndex={-1}
                       key={row.id}
                       selected={selectedRow && selectedRow.id === row.id}
-                      className={classes.tableRow}
+                      className={
+                        selectedRow && selectedRow.availability
+                          ? classes.tableRowTrue
+                          : classes.tableRowFalse
+                      }
                     >
                       <CustomTableCell align="left">{row.id}</CustomTableCell>
                       <CustomTableCell
@@ -377,7 +402,12 @@ export default function EnhancedTable({
                           color: row.availability ? "#3f51b5" : "#f50057",
                         }}
                       >
-                        {row.availability.toString()}
+                        <Chip
+                          label={row.availability.toString()}
+                          color={row.availability ? "primary" : "secondary"}
+                          className={classes.avialabiltyChip}
+                          variant="outlined"
+                        />
                       </CustomTableCell>
                       <CustomTableCell align="right">
                         {row.needing_repair.toString()}
@@ -410,7 +440,7 @@ export default function EnhancedTable({
         />
       </Paper>
       <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        control={<PurpleSwitch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
     </div>

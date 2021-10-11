@@ -6,6 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import calculateBookingCost from "../../utils/calculateBook";
+import DifferenceInDay from "../../utils/differenceInDays";
 
 export default function BookConfirmationDialog({
   open,
@@ -14,6 +15,16 @@ export default function BookConfirmationDialog({
   timeRange,
   buttonType,
 }) {
+  const showCost =
+    product &&
+    (buttonType === "book" || (buttonType === "return" && product.startDate));
+  const duration =
+    product && buttonType === "book"
+      ? timeRange.duration
+      : product && product.startDate
+      ? DifferenceInDay(product.startDate, product.endDate)
+      : 0;
+
   return (
     <Dialog
       open={open}
@@ -29,14 +40,14 @@ export default function BookConfirmationDialog({
 
       {product && (
         <DialogContent>
-          {!product.startDate && (
+          {showCost && (
             <DialogContentText id="alert-dialog-description">
-              Your total price is{" "}
+              Your total price is $
               {calculateBookingCost(
                 product.price,
                 product.discount,
                 product.minimum_rental_period,
-                timeRange.duration
+                duration
               )}
             </DialogContentText>
           )}

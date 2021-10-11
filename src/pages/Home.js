@@ -1,8 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
 import EnhancedTable from "../modules/DataTable/table";
-import ButtonsSection from "../modules/ProductCheckout/bookButton";
+import ProductCheckout from "../modules/ProductCheckout";
 import Data from "../data/dummyData.json";
+import Snackbar from "@material-ui/core/Snackbar";
 
 function insertIDs(data) {
   let temp = [];
@@ -31,6 +32,7 @@ export default function HomePage() {
   const classes = useStyles();
   const [rows, setRows] = React.useState(initDataFromLocalStorage(Data));
   const [selectedProduct, setSelectedProduct] = React.useState(null);
+  const [showNotification, setNotificationOpen] = React.useState(false);
 
   const callBackForTable = (data) => {
     setSelectedProduct(data);
@@ -40,10 +42,10 @@ export default function HomePage() {
     const fetchedFromLocalStorage = JSON.parse(
       localStorage.getItem("dataList")
     );
-    console.log(fetchedFromLocalStorage);
+
     setRows(fetchedFromLocalStorage);
     setSelectedProduct(null);
-    console.log("update");
+    setNotificationOpen(true);
   };
 
   return (
@@ -53,10 +55,18 @@ export default function HomePage() {
         selectedProduct={selectedProduct}
         callBackForTable={callBackForTable}
       />
-      <ButtonsSection
+      <ProductCheckout
         dataList={rows}
         selectedRow={selectedProduct}
         updateTable={updateTable}
+      />
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={showNotification}
+        onClose={() => setNotificationOpen(false)}
+        message="Table Updated"
+        autoHideDuration={3000}
       />
     </div>
   );

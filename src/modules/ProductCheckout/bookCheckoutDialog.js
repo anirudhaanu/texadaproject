@@ -38,6 +38,12 @@ const useStyles = makeStyles((theme) => ({
   dialog: {
     width: 400,
   },
+  header: {
+    background: theme.palette.grey["300"],
+    padding: 15,
+    fontWeight: 300,
+    fontSize: 20,
+  },
 }));
 
 export default function BookCheckoutDialog({
@@ -72,7 +78,9 @@ export default function BookCheckoutDialog({
       maxWidth={"md"}
     >
       {" "}
-      <DialogTitle id="simple-dialog-title">Book a product</DialogTitle>
+      <DialogTitle id="simple-dialog-title">
+        {buttonType === "book" ? "Book a product" : "Return a product"}
+      </DialogTitle>
       <DialogContent className={classes.dialogContents}>
         <FormControl variant="filled" className={classes.formControl}>
           <InputLabel id="demo-simple-select-filled-label">Product</InputLabel>
@@ -83,14 +91,8 @@ export default function BookCheckoutDialog({
               value={product.id}
               onChange={handleChange}
             >
-              <h1
-                style={{
-                  background: "yellow",
-                  width: "100%",
-                  top: 0,
-                }}
-              >
-                Select a product
+              <h1 className={classes.header}>
+                {buttonType === "book" ? "Book a product" : "Return a product"}
               </h1>
               {product &&
                 dataList.map((item) => {
@@ -114,7 +116,7 @@ export default function BookCheckoutDialog({
 
         <ProductInfo product={product} />
 
-        {buttonType === "return" && (
+        {buttonType === "return" && product.type === "meter" && (
           <MileageInputForReturn
             mileAgeAdded={mileAgeAdded}
             setMileAgeAdded={setMileAgeAdded}

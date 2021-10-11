@@ -6,6 +6,7 @@ import BookCheckoutDialog from "./bookCheckoutDialog";
 import DifferenceInDay from "../../utils/differenceInDays";
 import postBooking from "../../services/postBooking";
 import postReturn from "../../services/postReturn";
+import ButtonGroup from "./buttonGroup";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,7 +24,11 @@ const useStyles = makeStyles((theme) => ({
 
 const initTimeRange = { duration: 1, startDate: null, endDate: null };
 
-export default function ButtonsSection({ dataList, selectedRow, updateTable }) {
+export default function ProductCheckout({
+  dataList,
+  selectedRow,
+  updateTable,
+}) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [product, setProduct] = React.useState(null);
@@ -54,38 +59,26 @@ export default function ButtonsSection({ dataList, selectedRow, updateTable }) {
     );
     setProduct(dataList[index]);
   };
-  const handleCloseBook = () => {
+  const handleCloseCheckoutDialog = () => {
     setOpen(false);
   };
 
-  const handleOpenBook = (buttonType) => {
+  const handleOpenCheckoutDialog = (buttonType) => {
     setButtonType(buttonType);
     setOpen(true);
   };
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpenBook("book")}
-        disabled={!selectedRow || !selectedRow.availability}
-      >
-        Book
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => handleOpenBook("return")}
-        disabled={!selectedRow || selectedRow.availability}
-      >
-        Return
-      </Button>
+      <ButtonGroup
+        handleOpenCheckoutDialog={handleOpenCheckoutDialog}
+        selectedRow={selectedRow}
+      />
 
       {product && (
         <BookCheckoutDialog
           open={open}
-          handleCloseBook={handleCloseBook}
+          handleCloseBook={handleCloseCheckoutDialog}
           dataList={dataList}
           product={product}
           handleChange={handleChange}
