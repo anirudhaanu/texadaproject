@@ -1,5 +1,4 @@
 # Getting Started with texadaproject
-Assignment Project for the role Frontend Enginner
 This project is live here https://texadaproject.web.app/
 
 In the project directory, you can run:
@@ -74,7 +73,6 @@ If the durability is 0 at the time of booking, the operation is not forwarded
 * documentation
 * Greater isolation of business logic and UI
 * Durability check
-
 
 ## Thank You !
 
