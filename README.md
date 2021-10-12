@@ -64,9 +64,10 @@ If the durability is 0 at the time of booking, the operation is not forwarded
 * Notification for data changing event in localstorage
 * In Checkout dialog - only available or unavilable products can be selected depending on the Button pressed e.g. Book, Return
 * Live cost calculation and date warning when booking products
-* 
+
 
 ## Things I wish could be better
+* responsiveness maybe
 * naming convention
 * UI components could be made more dumber 
 * cleaner code
