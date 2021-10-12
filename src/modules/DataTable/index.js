@@ -45,7 +45,7 @@ export default function EnhancedTable({
   const classes = useStyles();
   const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("name");
+  const [orderBy, setOrderBy] = React.useState("id");
   const [selected, setSelected] = React.useState(null);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
@@ -55,10 +55,11 @@ export default function EnhancedTable({
 
   React.useEffect(() => {
     setRows(dataList);
-    setSelectedRow(selectedProduct);
-  }, [dataList, selectedProduct]);
+    cancelSearch();
+  }, [dataList]);
 
   const requestSearch = (searchedVal) => {
+    setSearched(searchedVal);
     const filteredRows = dataList.filter((row) => {
       return row.name.toLowerCase().includes(searchedVal.toLowerCase());
     });
@@ -67,7 +68,8 @@ export default function EnhancedTable({
 
   const cancelSearch = () => {
     setSearched("");
-    requestSearch(searched);
+    setRows(dataList);
+    //requestSearch(searched);
   };
 
   const handleClick = (event, name) => {
@@ -207,7 +209,7 @@ export default function EnhancedTable({
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 20, 25]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
